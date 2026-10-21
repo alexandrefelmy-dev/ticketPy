@@ -13,6 +13,35 @@ def maintenant():
     temps = datetime.now()
     return temps.strftime("%d/%m/%Y %H:%M")
 
+class Ticket:
+    def __init__(self, ticket_id, nom, description, priorite):
+        self.id = ticket_id
+        self.nom = nom
+        self.description = description
+        self.priorite = priorite
+        self.statut = "ouvert"
+        self.date_creation = maintenant()
+        self.date_fermeture = None
+
+    def afficher(self) : 
+        print(f"#{self.id} | {self.nom} | {self.priorite} | {self.statut} | {self.date_creation}")
+        print(f"    {self.description}")
+        if self.statut == "fermé":
+            print(f"    🔒 Fermé le {self.date_fermeture}")
+
+    def fermer(self):
+        
+        if self.statut == "fermé":
+            print(f"Ticket #{self.id} déjà fermé")
+
+        else : 
+            self.statut = "fermé"
+            self.date_fermeture = maintenant()
+            print(f"🔒 Ticket #{self.id} fermé !")
+            
+
+        
+
 def creer_ticket(compteur, tickets):
     nom = input("Nom du demandeur : ").strip()
     description = input("Description du problème : ").strip()
@@ -156,3 +185,9 @@ while continuer:
 
     else:
         print("Option invalide. Veuillez choisir une option valide (1-6).")
+
+
+
+
+
+
