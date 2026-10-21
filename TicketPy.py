@@ -1,15 +1,19 @@
 import json
 
 FICHIER = "tickets.json"
+PRIORITES = ("faible", "moyenne", "élevée")
 
 def menu():
-    print("1. Créer un ticket\n2. Afficher les tickets\n3. Fermer un ticket\n4. Quitter")
-    return input("Veuillez choisir une option (1-4) : ").strip()
+    print("1. Créer un ticket\n2. Afficher les tickets\n3. Fermer un ticket\n4. Statistiques\n5. Quitter")
+    return input("Veuillez choisir une option (1-5) : ").strip()
 
 def creer_ticket(compteur, tickets):
     nom = input("Nom du demandeur : ").strip()
     description = input("Description du problème : ").strip()
-    priorite = input("Priorité (faible, moyenne, élevée) : ").strip()
+    priorite = input("Priorité (faible, moyenne, élevée) : ").strip().lower()
+    while priorite not in PRIORITES :
+        print("❌ Priorité invalide.")
+        priorite = input("Choisissez parmi : faible, moyenne, élevée : ").strip().lower()
     statut = "ouvert"
     ticket = {
         "id": compteur,
@@ -62,6 +66,22 @@ def charger_tickets():
             return json.load(f)
     except FileNotFoundError:
         return []
+
+def afficher_statistiques(tickets):
+    print("--- Statistiques ---")
+    if not len(tickets) : 
+        print("Aucun ticket pour le moment.")
+    else :
+        print(f"Total : {len(tickets)} tickets")
+        nb_tickets_ouvert = len([ticket for ticket in tickets if ticket["statut"] == "ouvert"])
+        nb_tickets_ferme = len([ticket for ticket in tickets if ticket["statut"] == "fermé"])
+        print(f"Ouverts : {nb_tickets_ouvert} | Fermés : {nb_tickets_ferme}")
+        for priorite in PRIORITES:
+            nb = len([ticket for ticket in tickets if ticket["priorite"] == priorite])
+            print(f"{priorite} : {nb} | ", end="")
+        print()
+
+    
     
 
 
@@ -85,10 +105,13 @@ while continuer:
     elif choix == "3":
         fermer_ticket(tickets)
         sauvegarder_tickets(tickets)
-        
+
     elif choix == "4":
+        afficher_statistiques(tickets)
+        
+    elif choix == "5":
         print("Au revoir !")
         continuer = False
 
     else:
-        print("Option invalide. Veuillez choisir une option valide (1-4).")
+        print("Option invalide. Veuillez choisir une option valide (1-5).")
