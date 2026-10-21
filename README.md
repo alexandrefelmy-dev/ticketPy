@@ -63,5 +63,5 @@ Ce projet a été réalisé dans le cadre de mon apprentissage de Python. Il m'a
 - [x] Statistiques (nombre de tickets ouverts / fermés, répartition par priorité)
 - [x] Filtrer les tickets par statut ou par priorité
 - [x] Validation de la priorité saisie
-- [ ] Date de création des tickets
+- [x] Date de création des tickets
 - [ ] Passage en programmation orientée objet (classes)

@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 FICHIER = "tickets.json"
 PRIORITES = ("faible", "moyenne", "élevée")
@@ -8,20 +9,31 @@ def menu():
     print("1. Créer un ticket\n2. Afficher les tickets\n3. Fermer un ticket\n4. Statistiques\n5. Filtrer les tickets\n6. Quitter")
     return input("Veuillez choisir une option (1-6) : ").strip()
 
+def maintenant():
+    temps = datetime.now()
+    return temps.strftime("%d/%m/%Y %H:%M")
+
 def creer_ticket(compteur, tickets):
     nom = input("Nom du demandeur : ").strip()
     description = input("Description du problème : ").strip()
+
     priorite = input("Priorité (faible, moyenne, élevée) : ").strip().lower()
     while priorite not in PRIORITES :
         print("❌ Priorité invalide.")
         priorite = input("Choisissez parmi : faible, moyenne, élevée : ").strip().lower()
+
     statut = "ouvert"
+    date_creation = maintenant()
+    date_fermeture = None
+
     ticket = {
         "id": compteur,
         "nom": nom,
         "description": description,
         "priorite": priorite,
-        "statut": statut
+        "statut": statut,
+        "date_creation": date_creation,
+        "date_fermeture": date_fermeture
     }
     tickets.append(ticket)
     print(f"✅ Ticket #{compteur} créé !")
@@ -33,8 +45,10 @@ def afficher_tickets(tickets):
     else:
         print(f"--- Liste des tickets ({len(tickets)}) ---")
         for ticket in tickets:
-            print(f"#{ticket['id']} | {ticket['nom']} | {ticket['priorite']} | {ticket['statut']}")
+            print(f"#{ticket['id']} | {ticket['nom']} | {ticket['priorite']} | {ticket['statut']} | {ticket['date_creation']}")
             print(f"    {ticket['description']}")
+            if ticket["statut"] == "fermé":
+                print(f"    🔒 Fermé le {ticket['date_fermeture']}")
 
 def fermer_ticket(tickets):
     try:
@@ -48,6 +62,7 @@ def fermer_ticket(tickets):
 
                 else : 
                     ticket["statut"] = "fermé"
+                    ticket["date_fermeture"] = maintenant()
                     print(f"🔒 Ticket #{ticket_id} fermé !")
                 break
 
