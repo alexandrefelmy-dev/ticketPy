@@ -1,0 +1,20 @@
+# Hooks pre-commit : linters Python et Markdown.
+# Installation : python -m pip install pre-commit pylint pymarkdownlnt
+#                python -m pre_commit install
+# Les hooks utilisent les outils installés dans l'environnement Python
+# (mêmes versions que le skill /lint).
+repos:
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: python -m pylint
+        language: system
+        types: [python]
+        exclude: ^\.claude/
+      - id: pymarkdown
+        name: pymarkdown
+        entry: python -m pymarkdown scan
+        language: system
+        types: [markdown]
+        exclude: ^\.claude/
