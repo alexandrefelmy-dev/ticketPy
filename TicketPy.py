@@ -48,6 +48,25 @@ class Ticket:
             self.date_fermeture = maintenant()
             print(f"🔒 Ticket #{self.id} fermé !")
 
+    def vers_dict(self):
+        return {
+            "id": self.id,
+            "nom": self.nom,
+            "description": self.description,
+            "priorite": self.priorite,
+            "statut": self.statut,
+            "date_creation": self.date_creation,
+            "date_fermeture": self.date_fermeture
+            }
+
+def depuis_dict(d):
+    t = Ticket(d["id"], d["nom"], d["description"], d["priorite"])
+    t.statut = d["statut"]
+    t.date_creation = d.get("date_creation", "inconnue")
+    t.date_fermeture = d.get("date_fermeture")
+    return t
+
+
 
 def creer_ticket(compteur, tickets):
     """Demande les informations d'un nouveau ticket, l'ajoute à la liste
