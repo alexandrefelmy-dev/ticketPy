@@ -79,19 +79,7 @@ def creer_ticket(compteur, tickets):
         print("❌ Priorité invalide.")
         priorite = input("Choisissez parmi : faible, moyenne, élevée : ").strip().lower()
 
-    statut = "ouvert"
-    date_creation = maintenant()
-    date_fermeture = None
-
-    ticket = {
-        "id": compteur,
-        "nom": nom,
-        "description": description,
-        "priorite": priorite,
-        "statut": statut,
-        "date_creation": date_creation,
-        "date_fermeture": date_fermeture
-    }
+    ticket = Ticket(compteur, nom, description, priorite)
     tickets.append(ticket)
     print(f"✅ Ticket #{compteur} créé !")
     return compteur + 1
@@ -103,11 +91,7 @@ def afficher_tickets(tickets):
     else:
         print(f"--- Liste des tickets ({len(tickets)}) ---")
         for ticket in tickets:
-            print(f"#{ticket['id']} | {ticket['nom']} | {ticket['priorite']} | "
-                  f"{ticket['statut']} | {ticket['date_creation']}")
-            print(f"    {ticket['description']}")
-            if ticket["statut"] == "fermé":
-                print(f"    🔒 Fermé le {ticket['date_fermeture']}")
+            ticket.afficher()
 
 def fermer_ticket(tickets):
     """Demande un numéro de ticket et le ferme s'il existe."""
@@ -115,15 +99,9 @@ def fermer_ticket(tickets):
         ticket_id = int(input("Numéro du ticket à fermer : ").strip())
         trouve = False
         for ticket in tickets:
-            if ticket["id"] == ticket_id:
+            if ticket.id == ticket_id:
                 trouve = True
-                if ticket["statut"] == "fermé":
-                    print(f"Ticket #{ticket_id} déjà fermé")
-
-                else :
-                    ticket["statut"] = "fermé"
-                    ticket["date_fermeture"] = maintenant()
-                    print(f"🔒 Ticket #{ticket_id} fermé !")
+                ticket.fermer()
                 break
 
         if not trouve :
@@ -134,14 +112,16 @@ def fermer_ticket(tickets):
 
 def sauvegarder_tickets(tickets):
     """Enregistre les tickets dans le fichier JSON."""
+    donnees = [ticket.vers_dict() for ticket in tickets]
     with open(FICHIER, "w", encoding="utf-8") as f:
-        json.dump(tickets, f, ensure_ascii=False, indent=2)
+        json.dump(donnees, f, ensure_ascii=False, indent=2)
 
 def charger_tickets():
     """Charge les tickets depuis le fichier JSON (liste vide s'il n'existe pas)."""
     try :
         with open(FICHIER, "r", encoding="utf-8") as f:
-            return json.load(f)
+            donnees = json.load(f)
+            return [depuis_dict(d) for d in donnees]
     except FileNotFoundError:
         return []
 
@@ -152,11 +132,11 @@ def afficher_statistiques(tickets):
         print("Aucun ticket pour le moment.")
     else :
         print(f"Total : {len(tickets)} tickets")
-        nb_tickets_ouvert = len([ticket for ticket in tickets if ticket["statut"] == "ouvert"])
-        nb_tickets_ferme = len([ticket for ticket in tickets if ticket["statut"] == "fermé"])
+        nb_tickets_ouvert = len([ticket for ticket in tickets if ticket.statut == "ouvert"])
+        nb_tickets_ferme = len([ticket for ticket in tickets if ticket.statut == "fermé"])
         print(f"Ouverts : {nb_tickets_ouvert} | Fermés : {nb_tickets_ferme}")
         for priorite in PRIORITES:
-            nb = len([ticket for ticket in tickets if ticket["priorite"] == priorite])
+            nb = len([ticket for ticket in tickets if ticket.priorite == priorite])
             print(f"{priorite} : {nb} | ", end="")
         print()
 
@@ -169,7 +149,7 @@ def filtrer_tickets(tickets):
         while statut_choisi not in STATUTS:
             print("❌ Statut invalide.")
             statut_choisi = input("Statut (ouvert, fermé) : ").strip().lower()
-        resultat_statut = [ticket for ticket in tickets if ticket["statut"] == statut_choisi]
+        resultat_statut = [ticket for ticket in tickets if ticket.statut == statut_choisi]
         afficher_tickets(resultat_statut)
 
     elif filtre == "2":
@@ -177,7 +157,7 @@ def filtrer_tickets(tickets):
         while priorite_choisie not in PRIORITES:
             print("❌ Priorité invalide.")
             priorite_choisie = input("Priorité (faible, moyenne, élevée) : ").strip().lower()
-        resultat_priorite = [ticket for ticket in tickets if ticket["priorite"] == priorite_choisie]
+        resultat_priorite = [ticket for ticket in tickets if ticket.priorite == priorite_choisie]
         afficher_tickets(resultat_priorite)
 
     else :
